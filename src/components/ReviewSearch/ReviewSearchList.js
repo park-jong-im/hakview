@@ -338,6 +338,7 @@ function ReviewSearchList({ items, onUpdate, onUpdateSuccess, onDelete }) {
         margin: "0 auto",
         padding: "0 16 px ",
         border: "1px solid rgba(0 ,0 ,0 , 0.1)",
+        backgroundColor: "#FFFFFF",
 
         // 반응형 스타일
         "@media (max-width: 768px)": {

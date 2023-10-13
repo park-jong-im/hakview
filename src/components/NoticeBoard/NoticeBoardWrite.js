@@ -71,27 +71,27 @@
 //   };
 
 //   const handleSubmit = async () => {
-//     // e.preventDefault();
-//     // const formData = new FormData();
-//     // formData.append("title", values.title);
-//     // formData.append("content", values.content);
-//     // console.log(values);
-//     // let result;
+//     e.preventDefault();
+//     const formData = new FormData();
+//     formData.append("title", values.title);
+//     formData.append("content", values.content);
+//     console.log(values);
+//     let result;
 
-//     // try {
-//     //   setSubmittingError(null);
-//     //   setIsSubmitting(true);
-//     //   result = await onSubmit(formData);
-//     // } catch (error) {
-//     //   setSubmittingError(error);
-//     //   return;
-//     // } finally {
-//     //   setIsSubmitting(false);
-//     // }
+//     try {
+//       setSubmittingError(null);
+//       setIsSubmitting(true);
+//       result = await onSubmit(formData);
+//     } catch (error) {
+//       setSubmittingError(error);
+//       return;
+//     } finally {
+//       setIsSubmitting(false);
+//     }
 
-//     // const { review } = result;
-//     // setValues(INITIAL_VALUES);
-//     // onSubmitSuccess(review);
+//     const { review } = result;
+//     setValues(INITIAL_VALUES);
+//     onSubmitSuccess(review);
 //     await freeboard_api.write(values.title, values.body);
 //   };
 

@@ -13,7 +13,7 @@ import { Link as RouterLink } from "react-router-dom";
 const linkStyle = {
   textDecoration: "none",
   color: "gray",
-  fontSize: "14px",
+  fontSize: "15px",
 };
 
 function Login() {
@@ -76,10 +76,6 @@ function Login() {
   //     .catch();
   // }, []);
 
-  const linkStyle = {
-    textDecoration: "none",
-  };
-
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -135,21 +131,21 @@ function Login() {
           Login
         </Button>
 
-        <Grid container>
-          <Grid item xs>
+        <Grid container justifyContent="center">
+          <Grid item>
             <RouterLink to="/join" style={linkStyle}>
-              회원가입
+              회원가입&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
             </RouterLink>
           </Grid>
           <Grid item>
-            <Link component="button" style={linkStyle}>
-              아이디찾기
-            </Link>
+            <RouterLink to="/findId" style={linkStyle}>
+              아이디찾기&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+            </RouterLink>
           </Grid>
           <Grid item>
-            <Link component="button" style={linkStyle}>
+            <RouterLink to="/findPassword" style={linkStyle}>
               비밀번호찾기
-            </Link>
+            </RouterLink>
           </Grid>
         </Grid>
         <Box mt={10}>
