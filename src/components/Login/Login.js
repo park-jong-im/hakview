@@ -10,6 +10,12 @@ import Container from "@mui/material/Container";
 import logo1 from "../../img/logo1.png";
 import { Link as RouterLink } from "react-router-dom";
 
+const linkStyle = {
+  textDecoration: "none",
+  color: "gray",
+  fontSize: "14px",
+};
+
 function Login() {
   const [inputId, setInputId] = useState("");
   const [inputPw, setInputPw] = useState("");
@@ -131,12 +137,19 @@ function Login() {
 
         <Grid container>
           <Grid item xs>
-            <Link>비밀번호 찾기</Link>
+            <RouterLink to="/join" style={linkStyle}>
+              회원가입
+            </RouterLink>
           </Grid>
           <Grid item>
-            <RouterLink to="/join" style={linkStyle}>
-              <Link to="/join">회원가입</Link>
-            </RouterLink>
+            <Link component="button" style={linkStyle}>
+              아이디찾기
+            </Link>
+          </Grid>
+          <Grid item>
+            <Link component="button" style={linkStyle}>
+              비밀번호찾기
+            </Link>
           </Grid>
         </Grid>
         <Box mt={10}>
