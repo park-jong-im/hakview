@@ -4,6 +4,7 @@ import NativeSelect from "@mui/material/NativeSelect";
 import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
+import { useNavigate } from "react-router-dom";
 
 const Color = styled("div")`
   color: rgba(255, 255, 255, 0.65);
@@ -16,7 +17,11 @@ const InputWrapper = styled("div")`
   align-items: center;
   width: 700px;
   border: 1px solid #d9d9d9;
-  background-color: #440d8c;
+  background: linear-gradient(
+    45deg,
+    rgba(147, 112, 219, 0.8) 40%,
+    rgba(2, 136, 209, 0.8) 80%
+  );
   border-radius: 50px;
   padding: 1px;
   justify-content: end;
@@ -86,6 +91,21 @@ const selectStyle = {
 
 const MainSearchBar = () => {
   const [isFocused, setIsFocused] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (category, search) => {
+    if (category === "all") {
+      navigate("/acainfo", { state: { search } });
+    } else if (category === "review") {
+      navigate("/reviewsearchmain", { state: { search } });
+    }
+  };
+
+  const handleSearchClick = () => {
+    const selectedCategory = document.querySelector("select").value;
+    handleSearch(selectedCategory, searchText); // 검색어를 함께 전달
+  };
 
   return (
     <Container>
@@ -116,12 +136,15 @@ const MainSearchBar = () => {
             type="text"
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            value={searchText} // 입력된 검색어를 상태에 바인딩
+            onChange={(e) => setSearchText(e.target.value)} // 검색어가 변경될 때 업데이트
           />
 
           <IconButton
             type="submit"
             sx={{ p: "10px", color: "white" }}
             aria-label="search"
+            onClick={handleSearchClick}
           >
             <SearchIcon />
           </IconButton>

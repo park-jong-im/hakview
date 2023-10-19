@@ -1,19 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import { styled } from "@mui/system";
 import ReviewFormRating from "./ReviewFormRating";
+import { article_api, review_api } from "../../Api";
 
 const INITIAL_VALUES = {
   title: "",
-  teachRating: 0,
-  curriclmRating: 0,
-  serviceRating: 0,
-  convRating: 0,
-  costRating: 0,
-  content: "",
+  body: "",
+  starpoint1: 0,
+  starpoint2: 0,
+  starpoint3: 0,
+  starpoint4: 0,
+  starpoint5: 0,
+  tag1: "",
+  tag2: "",
+  tag3: "",
+  ac_name: "",
+  ac_title: "",
+  serial: 0,
 };
 
 const StyledForm = styled("form")`
@@ -48,20 +56,30 @@ export function handleCreateSuccess(review, setItems) {
 export default function ReviewWrite({
   initialValues = INITIAL_VALUES,
   onCancel,
-  onSubmit,
+  // onSubmit,
   onSubmitSuccess,
 }) {
   const [values, setValues] = useState(initialValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingError, setSubmittingError] = useState(null);
 
+  // 학원정보 저장용
+  const [ac_name, setAc_name] = useState("");
+  const [articleTitle, setArticleTitle] = useState("");
+  const [tag1, setTag1] = useState("");
+  const [tag2, setTag2] = useState("");
+  const [tag3, setTag3] = useState("");
+
+  // 파라미터
+  const { postId } = useParams();
+
   // 기존 값을 사용하여 selectedRatings 초기화
   const [selectedRatings, setSelectedRatings] = useState({
-    teachRating: initialValues.teachRating,
-    curriclmRating: initialValues.curriclmRating,
-    serviceRating: initialValues.serviceRating,
-    convRating: initialValues.convRating,
-    costRating: initialValues.costRating,
+    teachRating: initialValues.starpoint1,
+    curriclmRating: initialValues.starpoint2,
+    serviceRating: initialValues.starpoint3,
+    convRating: initialValues.starpoint4,
+    costRating: initialValues.starpoint5,
   });
 
   const navigate = useNavigate();
@@ -78,8 +96,7 @@ export default function ReviewWrite({
       onCancel();
       window.location.reload();
     } else {
-      navigate("/AcaReviewInfo?tab=2");
-      window.location.reload();
+      navigate(-1);
     }
   };
 
@@ -95,34 +112,62 @@ export default function ReviewWrite({
     }));
   };
 
+  // 학원정보 불러옴
+  async function fetchData() {
+    const articleData = await article_api.one(postId);
+    console.log(articleData);
+
+    setValues((prevValues) => ({
+      ...prevValues,
+      ac_name: articleData.ac_name, // ac_name 값을 직접 업데이트
+      ac_title: articleData.articleTitle,
+      tag1: articleData.tag1,
+      tag2: articleData.tag2,
+      tag3: articleData.tag3,
+      serial: articleData.articleSerial,
+    }));
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("title", values.title);
-    formData.append("content", values.content);
-
-    formData.append("teachRating", selectedRatings.teachRating);
-    formData.append("curriclmRating", selectedRatings.curriclmRating);
-    formData.append("serviceRating", selectedRatings.serviceRating);
-    formData.append("convRating", selectedRatings.convRating);
-    formData.append("costRating", selectedRatings.costRating);
     console.log(values);
+    await review_api.write(values);
 
-    let result;
-    try {
-      setSubmittingError(null);
-      setIsSubmitting(true);
-      result = await onSubmit(formData);
-    } catch (error) {
-      setSubmittingError(error);
-      return;
-    } finally {
-      setIsSubmitting(false);
-    }
+    // const formData = new FormData();
+    // formData.append("title", values.title);
+    // formData.append("body", values.body);
+    // formData.append("starpoint1", selectedRatings.teachRating);
+    // formData.append("starpoint2", selectedRatings.curriclmRating);
+    // formData.append("starpoint3", selectedRatings.serviceRating);
+    // formData.append("starpoint4", selectedRatings.convRating);
+    // formData.append("starpoint5", selectedRatings.costRating);
+    // formData.append("tag1", values.tag1);
+    // formData.append("tag2", values.tag2);
+    // formData.append("tag3", values.tag3);
+    // formData.append("ac_title", values.ac_title);
+    // formData.append("ac_name", values.ac_name);
+    // formData.append("serial", values.serial);
+    // console.log(formData);
 
-    const { review } = result;
-    setValues(INITIAL_VALUES);
-    onSubmitSuccess(review);
+    // let result;
+    // try {
+    //   setSubmittingError(null);
+    //   setIsSubmitting(true);
+    //   result = await onSubmit(formData);
+    // } catch (error) {
+    //   setSubmittingError(error);
+    //   return;
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
+
+    // const { review } = result;
+    // setValues(INITIAL_VALUES);
+    // onSubmitSuccess(review);
   };
 
   return (
@@ -140,7 +185,8 @@ export default function ReviewWrite({
               name="ac_name"
               disabled
               id="outlined-disabled"
-              defaultValue="잘나가는 학원"
+              value={values.ac_name}
+              onChange={handleInputChange}
               style={{ width: "100%" }}
             />
           </div>
@@ -151,7 +197,8 @@ export default function ReviewWrite({
               name="ac_title"
               disabled
               id="outlined-disabled"
-              defaultValue="고등연합2"
+              value={values.ac_title}
+              onChange={handleInputChange}
               style={{ width: "100%" }}
             />
           </div>
@@ -186,10 +233,10 @@ export default function ReviewWrite({
                 [1] 강사진의 강의력
               </h4>
               <ReviewFormRating
-                name="teachRating"
+                name="starpoint1"
                 label="[1] 강사진의 강의력"
-                value={values.teachRating}
-                onChange={(value) => handleChange("teachRating", value)}
+                value={values.starpoint1}
+                onChange={(value) => handleChange("starpoint1", value)}
                 onRatingSelect={handleRatingSelect}
               />
             </div>
@@ -200,10 +247,10 @@ export default function ReviewWrite({
                 [2] 커리큘럼·교재의 우수성
               </h4>
               <ReviewFormRating
-                name="curriclmRating"
+                name="starpoint2"
                 label="[2] 커리큘럼·교재의 우수성"
-                value={values.curriclmRating}
-                onChange={(value) => handleChange("curriclmRating", value)}
+                value={values.starpoint2}
+                onChange={(value) => handleChange("starpoint2", value)}
                 onRatingSelect={handleRatingSelect}
               />
             </div>
@@ -214,10 +261,10 @@ export default function ReviewWrite({
                 [3] 상담·의사소통의 원할함
               </h4>
               <ReviewFormRating
-                name="serviceRating"
+                name="starpoint3"
                 label="[3] 상담·의사소통의 원할함"
-                value={values.serviceRating}
-                onChange={(value) => handleChange("serviceRating", value)}
+                value={values.starpoint3}
+                onChange={(value) => handleChange("starpoint3", value)}
                 onRatingSelect={handleRatingSelect}
               />
             </div>
@@ -229,10 +276,10 @@ export default function ReviewWrite({
                 [4] 학사·행정관리의 체계성
               </h4>
               <ReviewFormRating
-                name="convRating"
+                name="starpoint4"
                 label="[4] 학사·행정관리의 체계성"
-                value={values.convRating}
-                onChange={(value) => handleChange("convRating", value)}
+                value={values.starpoint4}
+                onChange={(value) => handleChange("starpoint4", value)}
                 onRatingSelect={handleRatingSelect}
               />
             </div>
@@ -244,22 +291,50 @@ export default function ReviewWrite({
                 [5] 시설·환경의 편의성
               </h4>
               <ReviewFormRating
-                name="costRating"
+                name="starpoint5"
                 label="[5] 시설·환경의 편의성"
-                value={values.costRating}
-                onChange={(value) => handleChange("costRating", value)}
+                value={values.starpoint5}
+                onChange={(value) => handleChange("starpoint5", value)}
                 onRatingSelect={handleRatingSelect}
               />
             </div>
           </div>
+          <input
+            type="text"
+            name="tag1"
+            style={{ display: "none" }}
+            value={tag1}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="tag2"
+            style={{ display: "none" }}
+            value={tag2}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="tag3"
+            style={{ display: "none" }}
+            value={tag3}
+            onChange={handleInputChange}
+          />
+          <input
+            type="text"
+            name="serial"
+            style={{ display: "none" }}
+            value={postId}
+            onChange={handleInputChange}
+          />
           <div>* 리뷰 작성 하기</div>
           <StyledDiv>
             <StyledTextarea
               style={{ marginTop: "16px" }}
               minRows={4}
               placeholder="* 학원에 대한 자세한 후기를 남겨주세요."
-              name="content"
-              value={values.content}
+              name="body"
+              value={values.body}
               onChange={handleInputChange}
             />
           </StyledDiv>

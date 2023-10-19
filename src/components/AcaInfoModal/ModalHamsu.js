@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { article_api } from "../../Api";
 
 function ModalHamsu() {
     // 각 버튼에 대한 상태값과 모달 열기/닫기 함수를 각각 정의합니다.
@@ -11,51 +12,26 @@ function ModalHamsu() {
     const [suheomButtonClicked, setSuheomButtonClicked] = useState(false);
     const [licenceButtonClicked, setLicenceButtonClicked] = useState(false);
 
+    const [tagSearch, setTagSearch] = useState([]);
+
     // 별도의 함수 정의
-    const suheomClick1 = () => {
-        // 수험 검색 옵션 내용1을 클릭한 경우의 동작
-        // 수험 검색 옵션 내용1에 대한 처리를 추가하세요.
-        closeSuheomModal(); // 모달 닫기 함수 호출
+    const mainClick = async (tag1) => {
+        const response = await article_api.searchtag1(tag1);
+        setTagSearch(response.content);
+        closeAllModal();// 모달 닫기 함수 호출
     };
 
-    const suheomClick2 = () => {
-        // 수험 검색 옵션 내용2를 클릭한 경우의 동작
-        // 수험 검색 옵션 내용2에 대한 처리를 추가하세요.
-        closeSuheomModal(); // 모달 닫기 함수 호출
-    };
-
-    const suheomClick3 = () => {
-        // 수험 검색 옵션 내용3을 클릭한 경우의 동작
-        // 수험 검색 옵션 내용3에 대한 처리를 추가하세요.
-        closeSuheomModal(); // 모달 닫기 함수 호출
-    };
-
-    const suheomClick4 = () => {
-        // 수험 검색 옵션 내용3을 클릭한 경우의 동작
-        // 수험 검색 옵션 내용3에 대한 처리를 추가하세요.
-        closeSuheomModal(); // 모달 닫기 함수 호출
-    };
-
-    const suheomClick5 = () => {
-        // 수험 검색 옵션 내용3을 클릭한 경우의 동작
-        // 수험 검색 옵션 내용3에 대한 처리를 추가하세요.
+    const suheomClick = async (tag2) => {
+        const response = await article_api.searchtag2(tag2);
+        setTagSearch(response.content);
         closeSuheomModal(); // 모달 닫기 함수 호출
     };
 
     // 별도의 함수 정의
-    const licenceClick1 = () => {
-
-        closeLicenceModal(); // 모달 닫기 함수 호출
-    };
-
-    const licenceClick2 = () => {
-
-        closeLicenceModal(); // 모달 닫기 함수 호출
-    };
-
-    const licenceClick3 = () => {
-
-        closeLicenceModal(); // 모달 닫기 함수 호출
+    const licenceClick = async (tag3) => {
+        const response = await article_api.searchtag3(tag3);
+        setTagSearch(response.content);
+        closeLicenceModal();
     };
 
     // 각 모달 열기 함수를 정의합니다.
@@ -104,14 +80,9 @@ function ModalHamsu() {
         allButtonClicked,
         suheomButtonClicked,
         licenceButtonClicked,
-        suheomClick1,
-        suheomClick2,
-        suheomClick3,
-        suheomClick4,
-        suheomClick5,
-        licenceClick1,
-        licenceClick2,
-        licenceClick3,
+        mainClick,
+        suheomClick,
+        licenceClick,
         openAllModal,
         openSuheomModal,
         openLicenceModal,
@@ -119,7 +90,8 @@ function ModalHamsu() {
         closeSuheomModal,
         closeLicenceModal,
         handleMouseEnter,
-        handleMouseLeave
+        handleMouseLeave,
+        tagSearch
     }
 };
 

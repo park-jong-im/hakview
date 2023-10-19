@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import TabContext from "@mui/lab/TabContext";
@@ -12,16 +13,32 @@ import Typography from "@mui/material/Typography";
 import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
 import Footer from "../../Footer";
 import StarIcon from "@mui/icons-material/Star";
-import { getReview } from "../../api";
+import { getReview } from "../../api_원본";
 import AcademyInfo from "./AcademyInfo";
 import { useLocation } from "react-router-dom";
 import Header from "../../Header";
+
+import { article_api, review_api } from "../../Api"
 
 function AcaReviewInfo() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const initialTabValue = params.get("tab") || "1";
   const [value, setValue] = React.useState(initialTabValue);
+
+  // 파라미터
+  const { postId } = useParams();
+
+  // 학원 데이터
+  const [serial, setSerial] = useState(postId);
+  const [ac_name, setAc_name] = useState("");
+  const [ac_address, setAc_address] = useState("");
+  const [ac_phone, setAc_phone] = useState("");
+  const [ac_title, setAc_title] = useState("");
+  const [ac_body, setAc_body] = useState("");
+
+  // 리뷰 데이터
+  const [reviewData, setReviewData] = useState([]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -35,36 +52,48 @@ function AcaReviewInfo() {
     costRatingAvg: 0,
   });
 
-  async function fetchData() {
+  async function fetchData1() {
+    const response = await article_api.one(postId);
+    setSerial(response.serial);
+    setAc_name(response.ac_name);
+    setAc_address(response.ac_address);
+    setAc_phone(response.ac_phone);
+    setAc_title(response.articleTitle);
+    setAc_body(response.articleBody);
+    console.log(ac_title);
+    console.log(ac_body);
+  }
+
+  async function fetchData2() {
+
     try {
-      const result = await getReview({
-        order: "avgRating", // 평점 순으로 정렬 요청
-        offset: 0,
-        limit: 100, // 모든 데이터를 가져옵니다.
-      });
+
+      const reviewRow = await review_api.acreview1(postId);
+      setReviewData(reviewRow);
 
       // 각 항목의 평균값 계산
-      const totalTeachRating = result.news.reduce(
-        (acc, item) => acc + item.teachRating,
+      const totalTeachRating = reviewData.reduce(
+        (acc, item) => acc + item.starpoint1,
         0
       );
-      const totalCurriclmRating = result.news.reduce(
-        (acc, item) => acc + item.curriclmRating,
+
+      const totalCurriclmRating = reviewData.reduce(
+        (acc, item) => acc + item.starpoint2,
         0
       );
-      const totalServiceRating = result.news.reduce(
-        (acc, item) => acc + item.serviceRating,
+      const totalServiceRating = reviewData.reduce(
+        (acc, item) => acc + item.starpoint3,
         0
       );
-      const totalConvRating = result.news.reduce(
-        (acc, item) => acc + item.convRating,
+      const totalConvRating = reviewData.reduce(
+        (acc, item) => acc + item.starpoint4,
         0
       );
-      const totalCostRating = result.news.reduce(
-        (acc, item) => acc + item.costRating,
+      const totalCostRating = reviewData.reduce(
+        (acc, item) => acc + item.starpoint5,
         0
       );
-      const totalCount = result.news.length;
+      const totalCount = reviewData.length;
 
       // 평균값 설정
       setAverageRatings({
@@ -80,8 +109,12 @@ function AcaReviewInfo() {
   }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData2();
+  }, [serial]);
+
+  useEffect(() => {
+    fetchData1();
+  }, [serial]);
 
   const totalAverageRating =
     (averageRatings.teachRatingAvg +
@@ -132,7 +165,7 @@ function AcaReviewInfo() {
                   component="div"
                   sx={{ fontSize: "30px", fontWeight: "bold" }}
                 >
-                  주연테크 생각하는 수학원
+                  {ac_name} 학원
                 </Typography>
                 <VerifiedRoundedIcon
                   style={{ fontSize: 44, color: "#7c4dff" }}
@@ -143,7 +176,8 @@ function AcaReviewInfo() {
                 color="text.secondary"
                 sx={{ fontSize: "16px" }}
               >
-                부산 동래구 안남로 149 TEL. 031-207-23355
+                {ac_address}<br />
+                TEL. {ac_phone}
               </Typography>
               <div
                 style={{
@@ -190,7 +224,12 @@ function AcaReviewInfo() {
             </TabList>
           </Box>
           <TabPanel value="1">
-            <AcademyInfo />
+            <AcademyInfo
+              ac_address={ac_address}
+              ac_phone={ac_phone}
+              ac_title={ac_title}
+              ac_body={ac_body}
+            />
           </TabPanel>
           <TabPanel value="2">
             <ReviewMain />

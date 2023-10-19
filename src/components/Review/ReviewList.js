@@ -11,7 +11,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import FavoriteSharpIcon from "@mui/icons-material/FavoriteSharp";
 import FavoriteBorderSharpIcon from "@mui/icons-material/FavoriteBorderSharp";
-import { likeClick, getLikeClick } from "../../api";
+import { likeClick, getLikeClick } from "../../api_원본";
 import { useNavigate } from "react-router-dom";
 
 function formatDate(value) {
@@ -25,15 +25,15 @@ function ReviewListItem({ item, onDelete, onEdit, onLikeClick }) {
   };
 
   const {
-    title,
-    teachRating,
-    curriclmRating,
-    serviceRating,
-    convRating,
-    costRating,
-    avgRating,
-    date,
-    content,
+    reviewTitle,
+    starpoint1,
+    starpoint2,
+    starpoint3,
+    starpoint4,
+    starpoint5,
+    avgstarpoint,
+    createdAt,
+    reviewBody,
   } = item;
   const handleEditClick = () => {
     onEdit(item.aid);
@@ -119,16 +119,16 @@ function ReviewListItem({ item, onDelete, onEdit, onLikeClick }) {
                 component="div"
                 sx={{ fontSize: "15px", fontWeight: "bold" }}
               >
-                {avgRating.toFixed(1)}
+                {avgstarpoint.toFixed(1)}
               </Typography>
-              <Rating value={avgRating} />
+              <Rating value={avgstarpoint} />
             </div>
             <Typography
               variant="body2"
               color="text.secondary"
               sx={{ fontSize: "14px" }}
             >
-              수학 · 영어 {formatDate(date)}
+              수학 · 영어 {createdAt}
             </Typography>
           </div>
         </Stack>
@@ -154,7 +154,7 @@ function ReviewListItem({ item, onDelete, onEdit, onLikeClick }) {
               >
                 강 의 력
               </Typography>
-              <Rating value={teachRating} sx={{ fontSize: "20px" }} />
+              <Rating value={starpoint1} sx={{ fontSize: "20px" }} />
             </div>
             <div
               style={{
@@ -171,7 +171,7 @@ function ReviewListItem({ item, onDelete, onEdit, onLikeClick }) {
               >
                 커리큘럼
               </Typography>
-              <Rating value={curriclmRating} sx={{ fontSize: "20px" }} />
+              <Rating value={starpoint2} sx={{ fontSize: "20px" }} />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <Typography
@@ -181,7 +181,7 @@ function ReviewListItem({ item, onDelete, onEdit, onLikeClick }) {
               >
                 서 비 스
               </Typography>
-              <Rating value={serviceRating} sx={{ fontSize: "20px" }} />
+              <Rating value={starpoint3} sx={{ fontSize: "20px" }} />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <Typography
@@ -191,7 +191,7 @@ function ReviewListItem({ item, onDelete, onEdit, onLikeClick }) {
               >
                 편 의 성
               </Typography>
-              <Rating value={convRating} sx={{ fontSize: "20px" }} />
+              <Rating value={starpoint4} sx={{ fontSize: "20px" }} />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <Typography
@@ -201,7 +201,7 @@ function ReviewListItem({ item, onDelete, onEdit, onLikeClick }) {
               >
                 가 성 비
               </Typography>
-              <Rating value={costRating} sx={{ fontSize: "20px" }} />
+              <Rating value={starpoint5} sx={{ fontSize: "20px" }} />
             </div>
           </div>
 
@@ -224,14 +224,14 @@ function ReviewListItem({ item, onDelete, onEdit, onLikeClick }) {
                 width: "100%",
               }}
             >
-              {title}
+              {reviewTitle}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
               sx={{ fontSize: "14px", width: "100%" }}
             >
-              {content}
+              {reviewBody}
             </Typography>
           </div>
         </div>

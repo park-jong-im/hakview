@@ -2,7 +2,6 @@
 
 
 import * as React from "react";
-import axios from "axios";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import logo1 from "../../img/logo1.png";
@@ -32,22 +31,6 @@ export default function JoinInitiationForm() {
       </Typography>
     );
   }
-
-  const postData = {
-    key1: "value1",
-    key2: "value2",
-  };
-
-  axios
-    .post("http://example.com/api", postData)
-    .then((response) => {
-      // 요청이 성공했을 때의 동작
-      console.log("응답 데이터:", response.data);
-    })
-    .catch((error) => {
-      // 요청이 실패했을 때의 동작
-      console.error("에러 발생:", error);
-    });
   const cards = [
     {
       title: "학생/일반",

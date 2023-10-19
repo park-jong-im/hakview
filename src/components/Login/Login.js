@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { auth_api } from "../../Api";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
@@ -9,12 +9,6 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import logo1 from "../../img/logo1.png";
 import { Link as RouterLink } from "react-router-dom";
-
-const linkStyle = {
-  textDecoration: "none",
-  color: "gray",
-  fontSize: "15px",
-};
 
 function Login() {
   const [inputId, setInputId] = useState("");
@@ -28,45 +22,18 @@ function Login() {
     setInputPw(e.target.value);
   };
 
-  const onClickLogin = () => {
+  const onClickLogin = async () => {
     console.log("click login");
     console.log("ID : ", inputId);
     console.log("PW : ", inputPw);
-    axios
-      .post(
-        "https://116adddd-b5f0-4ac7-8449-957a6da3f657.mock.pstmn.io/login",
-        null,
-        {
-          params: {
-            user_id: inputId,
-            user_pw: inputPw,
-          },
-        }
+    try {
+      await auth_api.login(
+        inputId,
+        inputPw
       )
-      .then((res) => {
-        console.log(res);
-        console.log("res.data.userId :: ", res.data.userId);
-        console.log("res.data.msg :: ", res.data.msg);
-        if (res.data.userId === undefined) {
-          // id 일치하지 않는 경우 userId = undefined, msg = '입력하신 id 가 일치하지 않습니다.'
-          console.log("======================", res.data.msg);
-          alert("입력하신 id 가 일치하지 않습니다.");
-        } else if (res.data.userId === null) {
-          // id는 있지만, pw 는 다른 경우 userId = null , msg = undefined
-          console.log(
-            "======================",
-            "입력하신 비밀번호 가 일치하지 않습니다."
-          );
-          alert("입력하신 비밀번호 가 일치하지 않습니다.");
-        } else if (res.data.userId === inputId) {
-          // id, pw 모두 일치 userId = userId1, msg = undefined
-          console.log("======================", "로그인 성공");
-          sessionStorage.setItem("user_id", inputId);
-        }
-        // 작업 완료 되면 페이지 이동(새로고침)
-        document.location.href = "/";
-      })
-      .catch();
+    } catch {
+      alert("존재하지 않은 계정입니다.");
+    }
   };
 
   // useEffect(() => {
@@ -75,6 +42,10 @@ function Login() {
   //     .then((res) => console.log(res))
   //     .catch();
   // }, []);
+
+  const linkStyle = {
+    textDecoration: "none",
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -131,20 +102,13 @@ function Login() {
           Login
         </Button>
 
-        <Grid container justifyContent="center">
+        <Grid container>
+          <Grid item xs>
+            <Link>Forgot password?</Link>
+          </Grid>
           <Grid item>
             <RouterLink to="/join" style={linkStyle}>
-              회원가입&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-            </RouterLink>
-          </Grid>
-          <Grid item>
-            <RouterLink to="/findId" style={linkStyle}>
-              아이디찾기&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-            </RouterLink>
-          </Grid>
-          <Grid item>
-            <RouterLink to="/findPassword" style={linkStyle}>
-              비밀번호찾기
+              Sign Up
             </RouterLink>
           </Grid>
         </Grid>

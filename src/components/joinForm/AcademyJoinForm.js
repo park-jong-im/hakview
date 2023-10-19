@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import { auth_api } from "../../Api";
+// import { Link } from "react-router-dom";
 
 // Styled
 import Grid from "@mui/material/Grid";
@@ -13,10 +13,10 @@ import Button from "@mui/material/Button";
 import logo1 from "../../img/logo1.png";
 
 // JoinForm 컴포넌트 내에서 Message 스타일 설정
-const messageStyle = {
-  color: "red",
-  fontSize: "14px",
-};
+// const messageStyle = {
+//   color: "red",
+//   fontSize: "14px",
+// };
 
 // 회원가입 구현 event 변수선언
 const AcademyJoinForm = () => {
@@ -51,6 +51,14 @@ const AcademyJoinForm = () => {
   const [isAcademyName, setIsAcademyName] = useState(false);
   const [isAddress, setIsAddress] = useState(false);
   const [isAcademyPhone, setIsAcademyPhone] = useState(false);
+
+  // 유효성 메세지 폰트 색깔
+  const messageStyle = (isValid) => {
+    return {
+      color: isValid ? "blue" : "red",
+      fontSize: "14px"
+    }
+  };
 
   // 회원가입 구현 event 받아서 값 저장
   const onChangeId = (e) => {
@@ -97,17 +105,19 @@ const AcademyJoinForm = () => {
   const onChangePassword = (e) => {
     const currentPassword = e.target.value;
     setPassword(currentPassword);
-    const passwordRegExp =
-      /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/;
-    if (!passwordRegExp.test(currentPassword)) {
-      setPasswordMessage(
-        "숫자+영문자+특수문자 조합으로 8자리 이상 입력해주세요!"
-      );
-      setIsPassword(false);
-    } else {
-      setPasswordMessage("안전한 비밀번호 입니다.");
-      setIsPassword(true);
-    }
+    // const passwordRegExp =
+    //   /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/;
+    // if (!passwordRegExp.test(currentPassword)) {
+    //   setPasswordMessage(
+    //     "숫자+영문자+특수문자 조합으로 8자리 이상 입력해주세요!"
+    //   );
+    //   setIsPassword(false);
+    // } else {
+    //   setPasswordMessage("안전한 비밀번호 입니다.");
+    //   setIsPassword(true);
+    // }
+    setPasswordMessage("안전한 비밀번호 입니다.");
+    setIsPassword(true);
   };
 
   const requiredPassword = () => {
@@ -264,10 +274,9 @@ const AcademyJoinForm = () => {
   // 회원가입 버튼 클릭 시 실행되는 함수
   const handleSignUp = async () => {
     try {
-      // 엑시오스로 서버에 회원가입 요청 보내기
       if (
-        isName &&
         isId &&
+        isName &&
         isPassword &&
         isPasswordConfirm &&
         isPhone &&
@@ -276,37 +285,25 @@ const AcademyJoinForm = () => {
         isAddress &&
         isAcademyPhone
       ) {
-        const response = await axios
-          .post("http://localhost:8080/auth/signup", {
-            id: id,
-            name: name,
-            password: password,
-            passwordConfirm: passwordConfirm,
-            phone: phone,
-            birth: birth,
-            academyName: academyName,
-            address: address,
-            academyPhone: academyPhone,
-          })
-          .then((response) => {
-            alert(
-              "서버에 보내고 서버가 다시 보낸 데이터\n" +
-                JSON.stringify(response.data)
-            );
-          })
-          .catch(() => {
-            console.log("aaa");
-          });
-
-        // 서버 응답 처리
-        if (response.status === 201) {
-          alert("회원가입이 완료되었습니다.");
-        } else {
-          alert("회원가입 실패: 서버 오류");
-        }
+        await auth_api.signup(
+          id,
+          name,
+          password,
+          phone,
+          birth,
+          academyName,
+          address,
+          academyPhone
+        );
+        alert("회원가입 되었습니다!");
+      } else {
+        alert("회원가입에 맞는 양식을 작성해 주세요!")
       }
-    } catch (error) {
+
+    }
+    catch (error) {
       console.error("회원가입 오류:", error);
+      alert("중복된 아이디입니다!")
     }
   };
 
@@ -325,9 +322,9 @@ const AcademyJoinForm = () => {
     );
   }
 
-  const linkStyle = {
-    textDecoration: "none",
-  };
+  // const linkStyle = {
+  //   textDecoration: "none",
+  // };
 
   return (
     <React.Fragment>
@@ -374,7 +371,7 @@ const AcademyJoinForm = () => {
                 onChange={onChangeId}
                 onBlur={requiredId}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isId)}>
                 {idMessage}
               </p>
             </Grid>
@@ -391,7 +388,7 @@ const AcademyJoinForm = () => {
                 onChange={onChangeName}
                 onBlur={requiredName}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isName)}>
                 {nameMessage}
               </p>
             </Grid>
@@ -409,7 +406,7 @@ const AcademyJoinForm = () => {
                 onChange={onChangePassword}
                 onBlur={requiredPassword}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isPassword)}>
                 {passwordMessage}
               </p>
             </Grid>
@@ -427,7 +424,7 @@ const AcademyJoinForm = () => {
                 onChange={onChangePasswordConfirm}
                 onBlur={requiredPasswordConfirm}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isPasswordConfirm)}>
                 {passwordConfirmMessage}
               </p>
             </Grid>
@@ -437,20 +434,16 @@ const AcademyJoinForm = () => {
                 id="birth"
                 name="birth"
                 type="date"
-                label={birth ? "생년월일" : "생년월일"}
+                label="생년월일"
                 fullWidth
                 autoComplete="passwordConfirm"
                 variant="standard"
                 value={birth}
                 onChange={onChangeBirth}
                 onBlur={requiredBirth}
-                InputProps={{
-                  style: {
-                    color: birth ? "black" : "transparent"
-                  }
-                }}
+                InputProps={{ style: { color: "transparent" } }}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isBirth)}>
                 {birthMessage}
               </p>
             </Grid>
@@ -467,7 +460,7 @@ const AcademyJoinForm = () => {
                 onChange={addHyphen}
                 onBlur={requiredPhone}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isPhone)}>
                 {phoneMessage}
               </p>
             </Grid>
@@ -484,7 +477,7 @@ const AcademyJoinForm = () => {
                 onChange={onChangeAcademyName}
                 onBlur={requiredAcademyName}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isAcademyName)}>
                 {academyNameMessage}
               </p>
             </Grid>
@@ -501,7 +494,7 @@ const AcademyJoinForm = () => {
                 onChange={addAcademyHyphen}
                 onBlur={requiredAcademyPhone}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isAcademyPhone)}>
                 {academyPhoneMessage}
               </p>
             </Grid>
@@ -518,27 +511,25 @@ const AcademyJoinForm = () => {
                 onChange={onChangeAddress}
                 onBlur={requiredAddress}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isAddress)}>
                 {addressMessage}
               </p>
             </Grid>
-            <Link to="/login" style={linkStyle}>
-              <Button
-                variant="contained"
-                type="submit"
-                onClick={handleSignUp}
-                sx={{
-                  mt: 3,
-                  ml: 1,
-                  backgroundImage:
-                    "linear-gradient(45deg, #9370DB 30%, #0288d1 90%)",
-                  color: "white",
-                }}
-                top={null}
-              >
-                회원가입
-              </Button>
-            </Link>
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={handleSignUp}
+              sx={{
+                mt: 3,
+                ml: 1,
+                backgroundImage:
+                  "linear-gradient(45deg, #9370DB 30%, #0288d1 90%)",
+                color: "white",
+              }}
+              top={null}
+            >
+              회원가입
+            </Button>
           </Grid>
         </Paper>
       </Container>

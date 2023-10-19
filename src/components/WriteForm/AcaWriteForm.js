@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import { styled } from "@mui/system";
 import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
+import Box from '@mui/material/Box';
 // import { createReview } from "../../Api";
+import { article_api, ac_user_api } from '../../Api';
 
 const INITIAL_VALUES = {
+  ac_name: "",
+  ac_address: "",
+  ac_phone: "",
   title: "",
-  img: "",
   content: "",
-  avgRating: 0,
+  tag1: "",
+  tag2: "",
+  tag3: ""
 };
 
 const StyledForm = styled("form")`
@@ -71,8 +76,8 @@ export function handleCreateSuccess(review, setItems) {
 export default function ReviewForm({
   initialValues = INITIAL_VALUES,
   onCancel,
-  onSubmit,
-  onSubmitSuccess,
+  // onSubmit,
+  // onSubmitSuccess,
 }) {
   const [values, setValues] = useState(initialValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,7 +99,7 @@ export default function ReviewForm({
       onCancel();
       window.location.reload();
     } else {
-      navigate("/");
+      navigate("/acainfo");
       window.location.reload();
     }
   };
@@ -104,64 +109,64 @@ export default function ReviewForm({
     handleChange(name, value);
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0]; // 선택한 이미지 파일
+  // const handleImageUpload = async (e) => {
+  //   const file = e.target.files[0]; // 선택한 이미지 파일
 
-    // FormData 객체를 생성하여 이미지 파일을 담습니다.
-    const formData = new FormData();
-    formData.append("image", file);
-  };
+  //   // FormData 객체를 생성하여 이미지 파일을 담습니다.
+  //   const formData = new FormData();
+  //   formData.append("image", file);
+  // }
 
   // 카테고리 항목 만들기
   const category1 = [
     {
-      value: "subject1",
-      label: "수험",
+      value: "수험",
+      label: "수험"
     },
     {
-      value: "subject2",
-      label: "자격증",
-    },
+      value: "자격증",
+      label: "자격증"
+    }
   ];
 
   // 카테고리 항목 만들기
   const category2 = [
     {
-      value: "subject1",
-      label: "국어",
+      value: "국어",
+      label: "국어"
     },
     {
-      value: "subject2",
-      label: "수학",
+      value: "수학",
+      label: "수학"
     },
     {
-      value: "subject3",
-      label: "전기",
+      value: "전기",
+      label: "전기"
     },
     {
-      value: "subject4",
-      label: "IT",
-    },
+      value: "IT",
+      label: "IT"
+    }
   ];
 
   // 카테고리 항목 만들기
   const category3 = [
     {
-      value: "subject1",
-      label: "국어1",
+      value: "국어1",
+      label: "국어1"
     },
     {
-      value: "subject2",
-      label: "국어2",
+      value: "국어2",
+      label: "국어2"
     },
     {
-      value: "subject3",
-      label: "수학1",
+      value: "수학1",
+      label: "수학1"
     },
     {
-      value: "subject4",
-      label: "수학2",
-    },
+      value: "수학2",
+      label: "수학2"
+    }
   ];
   //   try {
   //     // 서버로 이미지 업로드 요청을 보냅니다.
@@ -184,44 +189,121 @@ export default function ReviewForm({
   //   }
   // };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const formData = new FormData();
-  //   formData.append("title", values.title);
-  //   formData.append("content", values.content);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 서버에서 유저 정보를 가져오기
+        const response = await ac_user_api.me();
+        if (!response.ac_name) {
+          alert("해당 폼은 학원 관계자만 작성이 가능합니다.")
+          navigate(-1)
+        }
+        handleChange("ac_name", response.ac_name);
+        handleChange("ac_address", response.ac_address);
+        handleChange("ac_phone", response.ac_phone);
+      } catch (error) {
+        console.error('유저 정보를 불러오는 데 실패했습니다.', error);
+      }
+    };
 
-  //   formData.append("img", values.img);
+    fetchData();
+  }, []);
 
-  //   console.log(values);
 
-  //   let result;
-  //   try {
-  //     setSubmittingError(null);
-  //     setIsSubmitting(true);
-  //     result = await createReview(formData); // createReview 함수를 호출하고 반환값을 저장
-  //     const { review } = result;
-  //     setValues(INITIAL_VALUES);
-  //     onSubmitSuccess(review);
-  //   } catch (error) {
-  //     setSubmittingError(error);
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
+  const handleSubmit = async () => {
+    // e.preventDefault();
+    // const formData = new FormData();
+    // formData.append("title", values.title);
+    // formData.append("content", values.content);
+
+    // formData.append("img", values.img);
+
+    // console.log(values);
+
+    // let result;
+    // try {
+    //   setSubmittingError(null);
+    //   setIsSubmitting(true);
+    //   result = await createReview(formData); // createReview 함수를 호출하고 반환값을 저장
+    //   const { review } = result;
+    //   setValues(INITIAL_VALUES);
+    //   onSubmitSuccess(review);
+    // } catch (error) {
+    //   setSubmittingError(error);
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
+    await article_api.createArticle(
+      values.ac_name,
+      values.ac_address,
+      values.ac_phone,
+      values.title,
+      values.content,
+      values.tag1,
+      values.tag2,
+      values.tag3
+    )
+  };
+
+
 
   return (
     <div>
       <div>
         <h2 style={{ textAlign: "center" }}>학원 등록하기</h2>
       </div>
-      {/* <StyledForm className="ReviewForm" onSubmit={handleSubmit}> 임시로 수정 */}
-      <StyledForm className="ReviewForm">
+      <StyledForm className="ReviewForm" onSubmit={handleSubmit}>
         * 학원명
         <StyledDiv>
           <TextField
             margin="normal"
-            name="title"
+            name="ac_name"
             label="학원명"
+            required
+            variant="outlined"
+            value={values.ac_name}
+            onChange={handleInputChange}
+            multiline
+            style={{ width: "100%" }}
+          />
+        </StyledDiv>
+        <div>* 학원 주소 등록하기</div>
+        <StyledDiv>
+          <TextField
+            margin="normal"
+            name="ac_address"
+            label="학원주소"
+            required
+            variant="outlined"
+            value={values.ac_address}
+            onChange={handleInputChange}
+            multiline
+            style={{ width: "100%" }}
+          />
+        </StyledDiv>
+        <div>* 학원 전화번호</div>
+        <StyledDiv>
+          <TextField
+            margin="normal"
+            name="ac_phone"
+            label="학원전화"
+            required
+            variant="outlined"
+            value={values.ac_phone}
+            onChange={handleInputChange}
+            multiline
+            style={{ width: "100%" }}
+          />
+        </StyledDiv>
+        <br />
+        <hr />
+        <br />
+        <div>* 강의 제목</div>
+        <StyledDiv>
+          <TextField
+            margin="normal"
+            name="title"
+            label="강의제목"
             required
             variant="outlined"
             value={values.title}
@@ -232,73 +314,64 @@ export default function ReviewForm({
         </StyledDiv>
         <br />
         <br />
-        <div>* 학원 주소 등록하기</div>
-        <StyledDiv>
-          <TextField
-            margin="normal"
-            name="content"
-            label="학원주소"
-            required
-            variant="outlined"
-            value={values.content}
-            onChange={handleInputChange}
-            multiline
-            style={{ width: "100%" }}
-          />
-        </StyledDiv>
-        <br />
-        <br />
         <Box
           component="form"
           sx={{
-            "& .MuiTextField-root": { m: 1, width: "18ch" },
+            '& .MuiTextField-root': { m: 1, width: '18ch' },
           }}
           noValidate
           autoComplete="off"
-        >
-          {" "}
-          <div>
+        >  <div>
             <TextField
               id="standard-select-category"
               select
               label="선택1"
-              defaultValue="수험"
-              helperText="카테고리를 선택해주세요."
+              // defaultValue="수험"
               variant="standard"
+              name="tag1"
+              value={values.tag1}
+              onChange={handleInputChange}
             >
               {category1.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
               ))}
+
             </TextField>
             <TextField
               id="standard-select-category"
               select
               label="선택2"
-              defaultValue="수험"
-              helperText="카테고리를 선택해주세요."
+              // defaultValue="수험"
               variant="standard"
+              name="tag2"
+              value={values.tag2}
+              onChange={handleInputChange}
             >
               {category2.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
               ))}
+
             </TextField>
             <TextField
               id="standard-select-category"
               select
               label="선택3"
-              defaultValue="수험"
-              helperText="카테고리를 선택해주세요."
+              // defaultValue="수험"
               variant="standard"
+              name="tag3"
+              value={values.tag3}
+              onChange={handleInputChange}
             >
               {category3.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
               ))}
+
             </TextField>
           </div>
         </Box>
@@ -317,12 +390,12 @@ export default function ReviewForm({
             multiline
             minRows={5} // 높이 조절
             style={{ width: "100%" }}
-            sx={{ minHeight: "100px" }} //  높이 조절
+            sx={{ minHeight: '100px' }} //  높이 조절
           />
         </StyledDiv>
         <br />
         <br />
-        <div> * 학원 로고 등록하기</div>
+        {/* <div> * 학원 로고 등록하기</div>
         <StyledDivv>
           <div
             style={{ margin: "20px", marginLeft: "7px", marginBottom: "40px" }}
@@ -345,7 +418,7 @@ export default function ReviewForm({
               &nbsp;&nbsp;{selectedFileName}
             </span>
           </div>
-        </StyledDivv>
+        </StyledDivv> */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Button
             onClick={() => {
@@ -386,7 +459,7 @@ export default function ReviewForm({
               }}
               onClick={async (event) => {
                 event.preventDefault();
-                // await handleSubmit(event);  임시로 수정
+                await handleSubmit();
                 handleCancel();
               }}
             >

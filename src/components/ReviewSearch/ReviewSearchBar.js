@@ -83,14 +83,26 @@ const NativeSelectStyled = styled(NativeSelect)`
     }
   }
 `;
-const selectStyle = {
-  "& .MuiNativeSelect-icon": {
-    color: "white", // 옵션 화살표 색상으로 변경
-  },
-};
+// const selectStyle = {
+//   "& .MuiNativeSelect-icon": {
+//     color: "white", // 옵션 화살표 색상으로 변경
+//   },
+// };
 
-const ReviewSearchBar = () => {
+const ReviewSearchBar = ({ onSearch }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    // 검색 버튼 클릭 시 검색 함수 호출
+    // 전달된 onSearch 함수를 호출하여 검색 결과를 부모 컴포넌트에 전달
+    onSearch(searchKeyword);
+  };
+
+  const onChangeSearchKeyword = (e) => {
+    setSearchKeyword(e.target.value);
+  }
 
   return (
     <Container>
@@ -107,6 +119,7 @@ const ReviewSearchBar = () => {
           <input
             type="text"
             placeholder="리뷰 검색창에 검색 할 내용을 입력 하세요"
+            onChange={onChangeSearchKeyword}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
@@ -115,6 +128,7 @@ const ReviewSearchBar = () => {
             type="submit"
             sx={{ p: "10px", color: "white" }}
             aria-label="search"
+            onClick={handleSearch}
           >
             <SearchIcon />
           </IconButton>

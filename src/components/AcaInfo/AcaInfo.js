@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import AcaInfoHamsu from "./AcaInfoHamsu";
@@ -17,6 +17,9 @@ import Header from "../../Header";
 import Footer from "../../Footer";
 
 import ReviewSearchBar from "../ReviewSearch/ReviewSearchBar";
+import { useLocation } from "react-router-dom";
+
+import { article_api } from "../../Api";
 
 function AcaInfo() {
   const {
@@ -25,6 +28,7 @@ function AcaInfo() {
     handleDelete,
     handleUpdateSuccess,
     sortedItems,
+    items,
     updateReview,
     currentPage,
     handlePageChange,
@@ -41,22 +45,80 @@ function AcaInfo() {
     isSuheomModalOpen,
 
     isLicenceModalOpen,
-    suheomClick1,
-    suheomClick2,
-    suheomClick3,
-    suheomClick4,
-    suheomClick5,
-    licenceClick1,
-    licenceClick2,
-    licenceClick3,
+    mainClick,
+    suheomClick,
+    licenceClick,
     closeAllModal,
     closeSuheomModal,
     closeLicenceModal,
     handleMouseEnter,
     handleMouseLeave,
+    tagSearch,
   } = ModalHamsu();
 
   const defaultTheme = createTheme();
+  const location = useLocation();
+  const category = location.state?.search || ""; // 데이터를 가져오고, 없으면 빈 문자열로 초기화
+
+  const [search, setSearch] = useState(category);
+  const [realItems, setRealItems] = useState([]);
+
+  const handleSearchResult = (searchResult) => {
+    // 이 함수 내에서 검색 결과를 처리합니다.
+    setSearch(searchResult);
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      // setIsLoading(true);
+      // setIsLoadingError(null);
+
+      const articleList = await article_api.search(search, 1);
+      console.log(articleList);
+      const formattedData = articleList.content.map((item) => ({
+        aid: item.articleSerial,
+        title: item.articleTitle,
+        content: item.body,
+        ac_name: item.ac_name,
+        ac_address: item.ac_address,
+        tag1: item.tag1,
+        tag2: item.tag2,
+        tag3: item.tag3,
+        date: item.createdAt.split(" ")[0],
+      }));
+      setRealItems(formattedData);
+      console.log(formattedData);
+
+      // const result = await getReview({ order, offset: 0, limit: LIMIT });
+      // setCurrentPage(1);
+      // console.log(result);
+      // setItems(result.news);
+      // const { paging } = result;
+      // setOffset(LIMIT); // 시작 위치 설정
+      // let parsePaging = JSON.parse(paging);
+      // setHasNext(parsePaging.hasNext);
+    }
+
+    fetchData();
+  }, [search]);
+
+  useEffect(() => {
+    async function fetchData2() {
+      const formattedData = tagSearch.map((item) => ({
+        aid: item.articleSerial,
+        title: item.articleTitle,
+        content: item.body,
+        ac_name: item.ac_name,
+        ac_address: item.ac_address,
+        tag1: item.tag1,
+        tag2: item.tag2,
+        tag3: item.tag3,
+        date: item.createdAt.split(" ")[0],
+      }));
+      setRealItems(formattedData);
+    }
+    fetchData2();
+  }, [tagSearch]);
 
   return (
     <div>
@@ -64,7 +126,7 @@ function AcaInfo() {
         <Container maxWidth="lg">
           <Header />
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <ReviewSearchBar />
+            <ReviewSearchBar onSearch={handleSearchResult} />
           </div>
           <BodyContainer style={{ marginTop: "3px" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -74,21 +136,21 @@ function AcaInfo() {
                 }}
               >
                 <CustomButton onClick={openAllModal} clicked={allButtonClicked}>
-                  전체
+                  메인
                 </CustomButton>
 
                 <CustomButton
                   onClick={openSuheomModal}
                   clicked={suheomButtonClicked}
                 >
-                  수험
+                  과목
                 </CustomButton>
 
                 <CustomButton
                   onClick={openLicenceModal}
                   clicked={licenceButtonClicked}
                 >
-                  자격증
+                  세부과목
                 </CustomButton>
               </div>
               <div
@@ -107,7 +169,7 @@ function AcaInfo() {
             </div>
             <Stack spacing={2} alignItems="center">
               <AcaList
-                items={sortedItems}
+                items={realItems}
                 onUpdate={updateReview}
                 onUpdateSuccess={handleUpdateSuccess}
                 onDelete={handleDelete}
@@ -140,7 +202,22 @@ function AcaInfo() {
               <h2 style={{ margin: "3px" }}>전체 검색</h2>
               <TableDesign>
                 <li>
-                  <p>전체 검색 옵션 내용</p>
+                  <div
+                    style={{ backgroundColor: "initial" }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <p onClick={() => mainClick("수험")}>수험</p>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    style={{ backgroundColor: "initial" }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <p onClick={() => mainClick("자격증")}>자격증</p>
+                  </div>
                 </li>
                 <br />
               </TableDesign>
@@ -148,7 +225,7 @@ function AcaInfo() {
           )}
           {isSuheomModalOpen && (
             <ModalTest onClose={closeSuheomModal}>
-              <h2 style={{ margin: "3px" }}>수험 검색</h2>
+              <h2 style={{ margin: "3px" }}>과목 필터링</h2>
               <TableDesign>
                 <li>
                   <div
@@ -156,7 +233,7 @@ function AcaInfo() {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <p onClick={suheomClick1}>수학</p>
+                    <p onClick={() => suheomClick("국어")}>국어</p>
                   </div>
                 </li>
                 <li>
@@ -165,7 +242,7 @@ function AcaInfo() {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <p onClick={suheomClick2}>영어</p>
+                    <p onClick={() => suheomClick("수학")}>수학</p>
                   </div>
                 </li>
                 <li>
@@ -174,7 +251,7 @@ function AcaInfo() {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <p onClick={suheomClick3}>국어</p>
+                    <p onClick={() => suheomClick("전기")}>전기</p>
                   </div>
                 </li>
                 <li>
@@ -183,16 +260,7 @@ function AcaInfo() {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <p onClick={suheomClick4}>과학</p>
-                  </div>
-                </li>
-                <li>
-                  <div
-                    style={{ backgroundColor: "initial" }}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <p onClick={suheomClick5}>사회</p>
+                    <p onClick={() => suheomClick("IT")}>IT</p>
                   </div>
                 </li>
                 <br />
@@ -201,16 +269,16 @@ function AcaInfo() {
           )}
           {isLicenceModalOpen && (
             <ModalTest onClose={closeLicenceModal}>
-              <h2 style={{ margin: "3px" }}>자격증 검색</h2>
+              <h2 style={{ margin: "3px" }}>세부 필터링</h2>
               <TableDesign>
                 <li>
                   <div
                     style={{ backgroundColor: "initial" }}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                    onClick={licenceClick1}
+                    onClick={() => licenceClick("국어1")}
                   >
-                    <p>국가기술자격증</p>
+                    <p>국어1</p>
                   </div>
                 </li>
                 <li>
@@ -218,9 +286,9 @@ function AcaInfo() {
                     style={{ backgroundColor: "initial" }}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                    onClick={licenceClick2}
+                    onClick={() => licenceClick("국어2")}
                   >
-                    <p>국가전문자격증</p>
+                    <p>국어2</p>
                   </div>
                 </li>
                 <li>
@@ -228,9 +296,19 @@ function AcaInfo() {
                     style={{ backgroundColor: "initial" }}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                    onClick={licenceClick3}
+                    onClick={() => licenceClick("수학1")}
                   >
-                    <p>민간자격증</p>
+                    <p>수학1</p>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    style={{ backgroundColor: "initial" }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onClick={() => licenceClick("수학2")}
+                  >
+                    <p>수학2</p>
                   </div>
                 </li>
 

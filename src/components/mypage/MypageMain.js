@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Acprofile from "./AcProfile";
+// import Divider from "@mui/material/Divider";
+// import Grid from "@mui/material/Grid";
 import Header from "../../Header";
 import AcModification from "./AcModification";
 import MyLikeList from "./MyLikeList";
-import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
-import ChecklistRtlRoundedIcon from "@mui/icons-material/ChecklistRtlRounded";
 
 const sections = [
   { title: "학원 정보", url: "#" },
@@ -68,6 +69,16 @@ function a11yProps(index) {
 
 export default function VerticalTabs() {
   const [value, setValue] = React.useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // 로컬 스토리지에서 login-token을 확인합니다.
+    const loginToken = localStorage.getItem("login-token");
+    if (!loginToken) {
+      alert("마이페이지는 로그인이 필요합니다!");
+      navigate("/login"); // /login 페이지로 이동
+    }
+  }, [navigate]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -85,7 +96,7 @@ export default function VerticalTabs() {
         noWrap
         sx={{ flexGrow: 1, backgroundColor: "white" }}
       />
-      <Box sx={{ display: "flex", maxWidth: "1000px", mt: 0, ml: 50 }}>
+      <Box sx={{ display: "flex", maxWidth: "1000px", mt: 2, ml: 50 }}>
         {/* 사이드 메뉴 */}
         <Tabs
           orientation="vertical"
@@ -100,44 +111,18 @@ export default function VerticalTabs() {
             label="마이페이지"
             {...a11yProps(0)}
             sx={{ fontSize: "1.2rem", fontWeight: "bold" }}
+            onClick={() => setValue(0)}
           />
 
           {/* 회원정보 수정 탭 */}
-          <Tab
-            {...a11yProps(1)}
-            label={
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <PersonRoundedIcon sx={{ marginRight: 1 }} />
-                회원정보 수정
-              </div>
-            }
-          />
+          <Tab label="회원정보 수정" {...a11yProps(1)} />
 
           {/* 내가 찜한 목록 탭 */}
-          <Tab
-            {...a11yProps(2)}
-            label={
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <ChecklistRtlRoundedIcon sx={{ marginRight: 1 }} />
-                내가 찜한 목록
-              </div>
-            }
-          />
+          <Tab label="내가 찜한 목록" {...a11yProps(2)} />
         </Tabs>
 
         {/* 마이페이지 컨텐츠 */}
-        <Box
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === "light"
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            width: "60%",
-            height: "100vh",
-            overflow: "auto",
-          }}
-        >
+        <Box sx={{ flexGrow: 1 }}>
           {/* 마이페이지 패널 */}
           <TabPanel value={value} index={0}>
             <Acprofile />
@@ -145,16 +130,16 @@ export default function VerticalTabs() {
 
           {/* 회원정보 수정 패널 */}
           <TabPanel value={value} index={1}>
-            <AcModification />
+            <AcModification setValue={setValue} />
           </TabPanel>
 
           {/* 내가 찜한 목록 패널 */}
           <TabPanel value={value} index={2}>
             <MyLikeList />
           </TabPanel>
-          <Copyright sx={{ pt: 4 }} />
         </Box>
       </Box>
+      <Copyright sx={{ pt: 4 }} />
     </Typography>
   );
 }

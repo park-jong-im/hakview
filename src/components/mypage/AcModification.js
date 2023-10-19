@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { ac_user_api } from "../../Api";
+import { Link } from "react-router-dom";
 
 // Styled
 import Grid from "@mui/material/Grid";
@@ -12,10 +13,10 @@ import Button from "@mui/material/Button";
 import logo1 from "../../img/logo1.png";
 
 // JoinForm 컴포넌트 내에서 Message 스타일 설정
-const messageStyle = {
-  color: "red",
-  fontSize: "14px",
-};
+// const messageStyle = {
+//   color: "red",
+//   fontSize: "14px",
+// };
 
 // 회원가입 구현 event 변수선언
 const AcModification = () => {
@@ -41,16 +42,44 @@ const AcModification = () => {
   const [academyPhoneMessage, setAcademyPhoneMessage] = useState("");
 
   // 유효성 검사
-  const [isId, setIsId] = useState(false);
-  const [isName, setIsName] = useState(false);
+  const [isId, setIsId] = useState(true);
+  const [isName, setIsName] = useState(true);
   const [isPassword, setIsPassword] = useState(false);
   const [isPasswordConfirm, setIsPasswordConfirm] = useState(false);
-  const [isPhone, setIsPhone] = useState(false);
-  const [isBirth, setIsBirth] = useState(false);
-  const [isAcademyName, setIsAcademyName] = useState(false);
-  const [isAddress, setIsAddress] = useState(false);
-  const [isAcademyPhone, setIsAcademyPhone] = useState(false);
+  const [isPhone, setIsPhone] = useState(true);
+  const [isBirth, setIsBirth] = useState(true);
+  const [isAcademyName, setIsAcademyName] = useState(true);
+  const [isAddress, setIsAddress] = useState(true);
+  const [isAcademyPhone, setIsAcademyPhone] = useState(true);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 서버에서 유저 정보를 가져오기
+        const response = await ac_user_api.me();
+        setId(response.id);
+        setName(response.nickname);
+        setBirth(response.birth);
+        setPhone(response.phone);
+        setAcademyName(response.ac_name);
+        setAddress(response.ac_address);
+        setAcademyPhone(response.ac_phone);
+      } catch (error) {
+        console.error('유저 정보를 불러오는 데 실패했습니다.', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+  // 유효성 메세지 폰트 색깔
+  const messageStyle = (isValid) => {
+    return {
+      color: isValid ? "blue" : "red",
+      fontSize: "14px"
+    }
+  };
   // 회원가입 구현 event 받아서 값 저장
   const onChangeId = (e) => {
     const currentId = e.target.value;
@@ -96,17 +125,19 @@ const AcModification = () => {
   const onChangePassword = (e) => {
     const currentPassword = e.target.value;
     setPassword(currentPassword);
-    const passwordRegExp =
-      /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/;
-    if (!passwordRegExp.test(currentPassword)) {
-      setPasswordMessage(
-        "숫자+영문자+특수문자 조합으로 8자리 이상 입력해주세요!"
-      );
-      setIsPassword(false);
-    } else {
-      setPasswordMessage("안전한 비밀번호 입니다.");
-      setIsPassword(true);
-    }
+    // const passwordRegExp =
+    //   /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/;
+    // if (!passwordRegExp.test(currentPassword)) {
+    //   setPasswordMessage(
+    //     "숫자+영문자+특수문자 조합으로 8자리 이상 입력해주세요!"
+    //   );
+    //   setIsPassword(false);
+    // } else {
+    //   setPasswordMessage("안전한 비밀번호 입니다.");
+    //   setIsPassword(true);
+    // }
+    setPasswordMessage("안전한 비밀번호 입니다.");
+    setIsPassword(true);
   };
 
   const requiredPassword = () => {
@@ -261,12 +292,28 @@ const AcModification = () => {
   };
 
   // 회원가입 버튼 클릭 시 실행되는 함수
-  const handleModify = async () => {
+  const handleSignUp = async () => {
     try {
-      // 엑시오스로 서버에 회원가입 요청 보내기
       if (
-        isName &&
         isId &&
+        isName &&
+        isPassword &&
+        isPasswordConfirm &&
+        isPhone &&
+        isBirth &&
+        !isAcademyName
+      ) {
+        await ac_user_api.updateInfo(
+          id,
+          name,
+          password,
+          phone,
+          birth
+        );
+        alert("내정보가 수정되었습니다!");
+      } else if (
+        isId &&
+        isName &&
         isPassword &&
         isPasswordConfirm &&
         isPhone &&
@@ -275,37 +322,25 @@ const AcModification = () => {
         isAddress &&
         isAcademyPhone
       ) {
-        const response = await axios
-          .post("http://localhost:8080/auth/modify", {
-            id: id,
-            name: name,
-            password: password,
-            passwordConfirm: passwordConfirm,
-            phone: phone,
-            birth: birth,
-            academyName: academyName,
-            address: address,
-            academyPhone: academyPhone,
-          })
-          .then((response) => {
-            alert(
-              "서버에 보내고 서버가 다시 보낸 데이터\n" +
-                JSON.stringify(response.data)
-            );
-          })
-          .catch(() => {
-            console.log("aaa");
-          });
-
-        // 서버 응답 처리
-        if (response.status === 201) {
-          alert("회원정보가 변경되었습니다.");
-        } else {
-          alert("회원정보 변경 실패: 서버 오류");
-        }
+        await ac_user_api.updateInfo(
+          id,
+          name,
+          password,
+          phone,
+          birth,
+          academyName,
+          address,
+          academyPhone
+        );
+        alert("내정보가 수정되었습니다!");
+      } else {
+        alert("알맞는 양식을 작성해 주세요!")
       }
-    } catch (error) {
-      console.error("회원정보 변경 오류:", error);
+
+    }
+    catch (error) {
+      console.error("회원가입 오류:", error);
+      alert("중복된 아이디입니다!")
     }
   };
 
@@ -354,11 +389,11 @@ const AcModification = () => {
                 fullWidth
                 autoComplete="id"
                 variant="standard"
-                value="개미킹"
+                value={id}
                 onChange={onChangeId}
                 onBlur={requiredId}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isId)}>
                 {idMessage}
               </p>
             </Grid>
@@ -371,11 +406,11 @@ const AcModification = () => {
                 fullWidth
                 autoComplete="name"
                 variant="standard"
-                value="개미킹"
+                value={name}
                 onChange={onChangeName}
                 onBlur={requiredName}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isName)}>
                 {nameMessage}
               </p>
             </Grid>
@@ -389,11 +424,11 @@ const AcModification = () => {
                 fullWidth
                 autoComplete="password"
                 variant="standard"
-                value="개미킹"
+                value={password}
                 onChange={onChangePassword}
                 onBlur={requiredPassword}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isPassword)}>
                 {passwordMessage}
               </p>
             </Grid>
@@ -407,11 +442,11 @@ const AcModification = () => {
                 fullWidth
                 autoComplete="passwordConfirm"
                 variant="standard"
-                value="개미킹"
+                value={passwordConfirm}
                 onChange={onChangePasswordConfirm}
                 onBlur={requiredPasswordConfirm}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isPasswordConfirm)}>
                 {passwordConfirmMessage}
               </p>
             </Grid>
@@ -434,7 +469,7 @@ const AcModification = () => {
                   },
                 }}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isBirth)}>
                 {birthMessage}
               </p>
             </Grid>
@@ -451,66 +486,71 @@ const AcModification = () => {
                 onChange={addHyphen}
                 onBlur={requiredPhone}
               />
-              <p className="message" style={messageStyle}>
+              <p className="message" style={messageStyle(isPhone)}>
                 {phoneMessage}
               </p>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                id="academyName"
-                name="academyName"
-                label="학원 이름"
-                fullWidth
-                autoComplete="academyName"
-                variant="standard"
-                value="주연테크"
-                onChange={onChangeAcademyName}
-                onBlur={requiredAcademyName}
-              />
-              <p className="message" style={messageStyle}>
+              {academyName &&
+                <TextField
+                  required
+                  id="academyName"
+                  name="academyName"
+                  label="학원 이름"
+                  fullWidth
+                  autoComplete="academyName"
+                  variant="standard"
+                  value={academyName}
+                  onChange={onChangeAcademyName}
+                  onBlur={requiredAcademyName}
+                />}
+              <p className="message" style={messageStyle(isAcademyName)}>
                 {academyNameMessage}
               </p>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                id="academyPhone"
-                name="academyPhone"
-                label="학원 전화번호"
-                fullWidth
-                autoComplete="academyPhone"
-                variant="standard"
-                value={academyPhone}
-                onChange={addAcademyHyphen}
-                onBlur={requiredAcademyPhone}
-              />
-              <p className="message" style={messageStyle}>
+              {academyName &&
+                <TextField
+                  required
+                  id="academyPhone"
+                  name="academyPhone"
+                  label="학원 전화번호"
+                  fullWidth
+                  autoComplete="academyPhone"
+                  variant="standard"
+                  value={academyPhone}
+                  onChange={addAcademyHyphen}
+                  onBlur={requiredAcademyPhone}
+                />}
+              <p className="message" style={messageStyle(isAcademyPhone)}>
                 {academyPhoneMessage}
               </p>
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                required
-                id="address"
-                name="address"
-                label="학원 주소"
-                fullWidth
-                autoComplete="shipping address-line1"
-                variant="standard"
-                value="이런이런 깊고깊은 개미굴"
-                onChange={onChangeAddress}
-                onBlur={requiredAddress}
-              />
-              <p className="message" style={messageStyle}>
+              {academyName &&
+                <TextField
+                  required
+                  id="address"
+                  name="address"
+                  label="학원 주소"
+                  fullWidth
+                  autoComplete="shipping address-line1"
+                  variant="standard"
+                  value={address}
+                  onChange={onChangeAddress}
+                  onBlur={requiredAddress}
+                />}
+              <p className="message" style={messageStyle(isAddress)}>
                 {addressMessage}
               </p>
             </Grid>
-
+            <Link to="/mypage" style={linkStyle}>
+              <Button sx={{ mt: 3, ml: 1 }}>돌아가기</Button>
+            </Link>
             <Button
               variant="contained"
               type="submit"
-              onClick={handleModify}
+              onClick={handleSignUp}
               sx={{
                 mt: 3,
                 ml: 1,

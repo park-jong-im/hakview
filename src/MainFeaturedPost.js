@@ -22,7 +22,7 @@ function MainFeaturedPost(props) {
         backgroundImage: `url(${img1})`,
       }}
     >
-    
+
       <Box
         sx={{
           position: "absolute",
@@ -41,10 +41,10 @@ function MainFeaturedPost(props) {
               pr: { md: 0 },
             }}
           >
-        
+
             <Button
               variant="subtitle1"
-              href="#"
+              href="/reviewsearchmain"
               type="submit"
               sx={{
                 mt: 10,

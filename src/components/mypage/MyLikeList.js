@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import ReviewSearchList from "../ReviewSearch/ReviewSearchList";
-import { getReview, updateReview, deleteReview, likeClick } from "../../api";
+import {
+  getReview,
+  updateReview,
+  deleteReview,
+  likeClick,
+} from "../../api_원본";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 
@@ -79,42 +84,40 @@ function MyLikeList() {
 
   return (
     <div>
-      <div>
-        <h2 style={{ textAlign: "center", margin: "10px 0" }}>
-          내가 찜한 목록
-        </h2>
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : loadingError ? (
-          <p>Error: {loadingError.message}</p>
-        ) : (
-          <>
-            <ReviewSearchList
-              items={items}
-              onUpdate={updateReview}
-              onDelete={deleteReview}
-              onUpdateSuccess={handleUpdateSuccess}
-              onLikeClick={likeClick}
+      <h2 style={{ textAlign: "center", margin: "50px 0" }}>
+        내가 찜한 목록
+      </h2>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : loadingError ? (
+        <p>Error: {loadingError.message}</p>
+      ) : (
+        <>
+          <ReviewSearchList
+            items={items}
+            onUpdate={updateReview}
+            onDelete={deleteReview}
+            onUpdateSuccess={handleUpdateSuccess}
+            onLikeClick={likeClick}
+          />
+          <Stack
+            spacing={2}
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "20px",
+            }}
+          >
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              variant="outlined"
+              color="secondary"
             />
-            <Stack
-              spacing={2}
-              sx={{
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: "20px",
-              }}
-            >
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-                variant="outlined"
-                color="secondary"
-              />
-            </Stack>
-          </>
-        )}
-      </div>
+          </Stack>
+        </>
+      )}
     </div>
   );
 }

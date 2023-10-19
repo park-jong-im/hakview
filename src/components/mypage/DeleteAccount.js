@@ -4,6 +4,7 @@ import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
+import { ac_user_api } from "../../Api";
 
 const style = {
   position: "absolute",
@@ -16,7 +17,7 @@ const style = {
   boxShadow: 24,
 };
 
-function DeleteAccount({ onConfirm }) {
+function DeleteAccount({ onConfirm, password }) {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
 
@@ -24,9 +25,21 @@ function DeleteAccount({ onConfirm }) {
 
   // 확인 버튼 클릭 시 처리
   const handleConfirmClose = () => {
-    setOpen(false);
-    onConfirm();
-    navigate("/");
+    ac_user_api.delete(password)
+      .then((response) => {
+        // 비밀번호가 일치하면 실행
+        alert("계정이 탈퇴되었습니다.. 이용해주셔서 감사합니다.");
+        localStorage.removeItem('login-token');
+        localStorage.removeItem('refreshToken');
+        setOpen(false);
+        onConfirm();
+        navigate("/");
+      })
+      .catch((error) => {
+        // 에러가 발생하면 실행
+        console.error("계정 삭제 중 오류 발생: ", error);
+        alert("비밀번호가 일치하지 않습니다.");
+      })
   };
 
   // 취소 버튼 클릭 시 처리
@@ -72,7 +85,6 @@ function DeleteAccount({ onConfirm }) {
 
 export default function NestedModal() {
   const [password, setPassword] = React.useState("");
-  const correctPassword = "1234";
 
   const [open, setOpen] = React.useState(false);
 
@@ -118,7 +130,7 @@ export default function NestedModal() {
             />
 
             {/* 비밀번호 확인 버튼 클릭 시 비밀번호 검사 후 DeleteAccount 모달 열기 */}
-            <Button
+            {/* <Button
               onClick={() => {
                 if (password === correctPassword) {
                   handleOpen();
@@ -129,7 +141,7 @@ export default function NestedModal() {
               sx={{ mb: 5 }}
             >
               비밀번호 확인
-            </Button>
+            </Button> */}
           </Box>
 
           {/* 탈퇴 확인 모달 */}
@@ -138,6 +150,7 @@ export default function NestedModal() {
               setPassword("");
               handleClose();
             }}
+            password={password}
           />
         </Box>
       </Modal>

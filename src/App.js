@@ -17,10 +17,6 @@ import Login from "./components/Login/Login";
 import AcModification from "./components/mypage/AcModification";
 import AcaInfo from "./components/AcaInfo/AcaInfo";
 import AcaWriteForm from "./components/WriteForm/AcaWriteForm";
-import FindId from "./components/findOut/FindId";
-import FindResultId from "./components/findOut/FindResultId";
-import FindPassword from "./components/findOut/FIndPassword";
-import FindResultPassword from "./components/findOut/FIndRseultPassword";
 
 function App() {
   return (
@@ -28,12 +24,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/reviewwrite" element={<ReviewWrite />} />
-        <Route path="/reviewwriteform" element={<ReviewWriteForm />} />
+        <Route path="/reviewwriteform/:postId" element={<ReviewWriteForm />} />
         <Route path="/noticeboardmain" element={<NoticeBoardMain />} />
         <Route path="/noticeboardwrite" element={<NoticeBoardWrite />} />
         <Route path="/noticeboardform/:postId" element={<NoticeBoardForm />} />
         <Route path="/reviewsearchmain" element={<ReviewSearchMain />} />
-        <Route path="/acareviewinfo" element={<AcaReviewInfo />} />
+        <Route path="/acareviewinfo/:postId" element={<AcaReviewInfo />} />
         <Route path="/mypage" element={<MypageMain />} />
         <Route path="/mylikelist" element={<MyLikeList />} />
         <Route path="/join" element={<JoinInitiationForm />} />
@@ -44,10 +40,6 @@ function App() {
         <Route path="/modify" element={<AcModification />} />
         <Route path="/acaWriteform" element={<AcaWriteForm />} />
         <Route path="/acainfo" element={<AcaInfo />} />
-        <Route path="/findId" element={<FindId />} />
-        <Route path="/findResultId" element={<FindResultId />} />
-        <Route path="/findPassword" element={<FindPassword />} />
-        <Route path="/findResultPassword" element={<FindResultPassword />} />
       </Routes>
     </Router>
   );

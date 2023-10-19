@@ -3,7 +3,7 @@ import axios from "axios";
 const BASE_URL = "http://localhost:8080/";
 
 const token =
-  "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfQUNBRE1JTiIsImV4cCI6MTY5NjkzNjgwN30.vWOUPBgzXS46PGUdX-waBqwWNZjrOW_dWICUqjiA5FF0OOLcLGJjUYA6JktbYJYkacipsNgPiQ13RTS6LIWpaA"; // 로컬 스토리지에서 토큰을 가져옵니다
+  "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfQUNBRE1JTiIsImV4cCI6MTY5Njc1MDM3Mn0.0XmIyhRjziRqT7wB-FZf6MiG5sFlr0VD3O0M3fwu2PHLUrqINE5YY5HAcq5hBp4Axlol65OWgM6lJyEDXClTEw"; // 로컬 스토리지에서 토큰을 가져옵니다
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,

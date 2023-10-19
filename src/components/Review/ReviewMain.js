@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import ReviewList from "./ReviewList";
-import { getReview, updateReview, deleteReview, likeClick } from "../../api";
+import {
+  getReview,
+  updateReview,
+  deleteReview,
+  likeClick,
+} from "../../api_원본";
 import Button from "@mui/material/Button";
 import ModeIcon from "@mui/icons-material/Mode";
 import AverageString from "./AverageString";
@@ -10,6 +16,8 @@ import Typography from "@mui/material/Typography";
 import { Link } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
+
+import { review_api } from "../../Api";
 
 const LIMIT = 5; // 페이지당 보이는 갯수
 
@@ -30,6 +38,9 @@ function ReviewMain() {
   });
 
   const [totalPages, setTotalPages] = useState(1);
+
+  // 파라미터
+  const { postId } = useParams();
 
   // 최신순 정렬 클릭 핸들러
   const handleNewestClick = () => {
@@ -58,43 +69,43 @@ function ReviewMain() {
 
   async function fetchData() {
     try {
-      const result = await getReview({
-        offset: (currentPage - 1) * LIMIT,
-        limit: LIMIT,
-      });
+      const result = await review_api.acreview2(postId);
 
-      setItems(result.news);
-      const { paging } = result;
-      let parsePaging = JSON.parse(paging);
-      setHasNext(parsePaging.hasNext);
+      setItems(result);
+      console.log("리뷰템" + items)
+      // const { paging } = result;
+      // let parsePaging = JSON.parse(paging);
+      // setHasNext(parsePaging.hasNext);
 
-      // Update the total pages when fetching new data
-      const totalItems = parsePaging.total;
-      const calculatedTotalPages = Math.ceil(totalItems / LIMIT);
-      setTotalPages(calculatedTotalPages);
+      // // Update the total pages when fetching new data
+      // const totalItems = parsePaging.total;
+      // const calculatedTotalPages = Math.ceil(totalItems / LIMIT);
+      // setTotalPages(calculatedTotalPages);
 
       // 각 항목의 평균값 계산
-      const totalTeachRating = result.news.reduce(
-        (acc, item) => acc + item.teachRating,
+      const totalTeachRating = result.reduce(
+        (acc, item) => acc + item.starpoint1,
         0
       );
-      const totalCurriclmRating = result.news.reduce(
-        (acc, item) => acc + item.curriclmRating,
+
+      console.log("토탈토탈토탈ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ" + totalTeachRating)
+      const totalCurriclmRating = result.reduce(
+        (acc, item) => acc + item.starpoint2,
         0
       );
-      const totalServiceRating = result.news.reduce(
-        (acc, item) => acc + item.serviceRating,
+      const totalServiceRating = result.reduce(
+        (acc, item) => acc + item.starpoint3,
         0
       );
-      const totalConvRating = result.news.reduce(
-        (acc, item) => acc + item.convRating,
+      const totalConvRating = result.reduce(
+        (acc, item) => acc + item.starpoint4,
         0
       );
-      const totalCostRating = result.news.reduce(
-        (acc, item) => acc + item.costRating,
+      const totalCostRating = result.reduce(
+        (acc, item) => acc + item.starpoint5,
         0
       );
-      const totalCount = result.news.length;
+      const totalCount = result.length;
 
       // 평균값 설정
       setAverageRatings({
@@ -149,7 +160,7 @@ function ReviewMain() {
             }}
           >
             <h4>학원 후기를 작성해주세요!</h4>
-            <Link to="/ReviewWriteForm">
+            <Link to={`/ReviewWriteForm/${postId}`}>
               <Button
                 variant="contained"
                 color="primary"
