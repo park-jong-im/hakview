@@ -1,0 +1,97 @@
+// queryDsl버전
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.15'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+
+	//querydsl 추가
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+}
+
+group = 'com.jwt'
+version = '0.0.1-SNAPSHOT'
+java {
+	sourceCompatibility = '17'
+}
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+	
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+    
+    // Querydsl 의존성
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+	
+	// 오라클
+	implementation group: 'com.oracle.database.jdbc', name: 'ojdbc6', version: '11.2.0.4'
+}
+
+
+test {
+	useJUnitPlatform()
+}
+//querydsl 사용 경로
+def querydslDir =  "src/main/generated"
+
+//querydsl 사용 설정
+querydsl {
+	jpa = true
+	querydslDefault = true
+	querydslSourcesDir = querydslDir
+}
+
+// build 시 사용할 sourceSet
+sourceSets {
+	main { 
+		java {
+			srcDirs = ['src/main/java', querydslDir] 
+		}
+	}
+}
+
+//컴파일 클래스 패스에 넣음.
+configurations {
+    querydsl.extendsFrom compileClasspath
+}
+
+//feature/improve-all
+// querydsl 컴파일 시 사용할 옵션.
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+//feature/improve-all
+// QType 정리
+clean {
+	delete file(querydslDir)
+}

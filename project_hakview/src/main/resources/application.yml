@@ -1,0 +1,24 @@
+server:
+#  port: 7080
+  servlet:
+    encoding: 
+      charset: UTF-8
+      force: true
+      enabled: true
+
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/xe
+    username: hakview
+    password: 1234
+    driver-class-name: oracle.jdbc.OracleDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        database-platform: org.hibernate.dialect.Oracle10gDialect
+
+jwt:
+  secret:
